@@ -7,6 +7,9 @@
 *.obj
 *.elf
 
+# DS Store Files
+*.DS_Store
+
 # Linker output
 *.ilk
 *.map
