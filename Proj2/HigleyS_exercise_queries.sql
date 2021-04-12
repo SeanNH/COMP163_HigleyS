@@ -34,6 +34,8 @@ from TruckLog
 inner join Truck on Truck.VIN = TruckLog.VIN
 order by CurrentMiles desc
 
+
+
 /* 2a		Rank the customers in descending revenue amounts in a sortable grid.*/
 Select sum(TransactionTable.TotalCost) as revenueEarned, Company.Description
 from TransactionTable
@@ -75,9 +77,47 @@ inner join Company on Company.CompanyID = Contact.CompanyID
 group by Company.Description
 order by expressTotal desc 
 
+
+
 /* 3a 	 Identify new drivers. These are drivers who have never been on a trip.*/
+SELECT Driver.DriverID
+from Driver
+inner join Shipment on Shipment.DriverID = Driver.DriverID
+where Driver.numTrips <=0 or Driver.numTrips is NULL
+group by Driver.DriverID
 
 /* 3b		  Who is the oldest driver*/
+Select Top 1 Driver.DriverID,(Driver.Fname + ' ' + Driver.Lname) as Oldest_Driver, Driver.DOB
+from Driver
+order by Driver.DOB ASC
 
 /* 3c		Cool wheels likes to buy the drivers birthday cakes during their birthday month. List the driver names sorted by birth month. Show just the month, not the specific birthdate. */
+Select (Driver.Fname + ' ' + Driver.Lname) as Driver, format(Driver.DOB,'MMMM')as BirthMonth
+from Driver
+order by BirthMonth desc
+
+
+
+/* 4a		Show a sortable grid with the refueling costs per vendor.*/
+Select Refuel.Vendor, avg(Refuel.Price / Refuel.Quantity) as avgPrice_Per_Gallon
+from Refuel
+group by Refuel.Vendor
+order by avgPrice_Per_Gallon asc
+
+/* 4b		Which trip has the longest point to point distance – delivery less pickup miles.*/
+Select Shipment.ActualMiles, Shipment.PickupDate, Shipment.DeliverBy
+from Shipment
+order by Shipment.ActualMiles DESC
+
+/* 4c 	Which driver had the longest total trip mileage. Show the initial starting point and the final destination with the driver name. Note – this will involve chaining multiple trips together. A trip with a null end mile would be linked to another trip where trip1 delivery mile = trip2 start mile. Also the driver would be the same. */
+Select top 1 Driver.Lname, sum(Shipment.ActualMiles) as TotalMilesDriven
+from Shipment
+Inner Join Driver on Driver. DriverID = Shipment.DriverID
+group by Driver.Lname
+order by TotalMilesDriven DESC
+
+
+
+
+
 
